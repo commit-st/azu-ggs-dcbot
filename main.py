@@ -1,3 +1,17 @@
+import aiohttp
+from aiohttp import web
+
+async def health_check(request):
+    return web.Response(text="OK", status=200)
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get('/health', health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8000)
+    await site.start()
+
 import discord, os, logging
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -16,10 +30,11 @@ class MyBot(commands.Bot):
             if fn.endswith(".py"):
                 await self.load_extension(f"cogs.{fn[:-3]}")
 
-bot = MyBot(command_prefix="!", intents=intents)                
+bot = MyBot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} 연결 완료!🩵")
+    bot.loop.create_task(start_web_server())  
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
