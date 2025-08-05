@@ -1,3 +1,14 @@
+async def ping_self():
+    await bot.wait_until_ready()
+    url = os.environ['KOYEB_URL']
+    while not bot.is_closed():
+        try:
+            async with aiohttp.ClientSession() as session:
+                await session.get(url)
+        except:
+            pass
+        await asyncio.sleep(180)
+
 import aiohttp
 from aiohttp import web
 
@@ -38,3 +49,4 @@ async def on_ready():
     bot.loop.create_task(start_web_server())  
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
