@@ -42,7 +42,6 @@ class MyBot(commands.Bot):
     async def setup_hook(self):
         for fn in os.listdir("./cogs"):
             if fn.endswith(".py"):
-                 print(f"🔄 Loading cog: cogs.{fn[:-3]}")
                 await self.load_extension(f"cogs.{fn[:-3]}")
 
 bot = MyBot(command_prefix="!", intents=intents)
@@ -54,3 +53,4 @@ async def on_ready():
     bot.loop.create_task(ping_self())
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
