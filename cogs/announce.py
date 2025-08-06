@@ -89,7 +89,7 @@ class Announce(commands.Cog):
 
         # Embed 생성
         embed = discord.Embed(
-            title=f"{title} /",
+            title=f"{title} ",
             description=content,
             color=discord.Color(c)
         )
