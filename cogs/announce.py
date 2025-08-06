@@ -9,13 +9,13 @@ class Announce(commands.Cog):
 
     @app_commands.command(
         name="announce",
-        description="Embed 공지 전송 (공개 채널에 전송)"
-        default_member_permissions=discord.Permissions(administrator=True)
+        description="Embed 공지 전송 (공개 채널에 전송)",
+        default_member_permissions=discord.Permissions(administrator=True),
     )
     @app_commands.describe(
         color="HEX 색상 코드 (#RRGGBB)",
         title="제목(큰 글씨)",
-        content="본문"
+        content="본문",
     )
     @app_commands.checks.has_permissions(administrator=True)
     async def announce(
@@ -47,7 +47,7 @@ class Announce(commands.Cog):
 
     @app_commands.command(
         name="colorchat",
-        description="Embed 메시지 전송 (공개 채널에 전송, 제목 없이)"
+        description="Embed 메시지 전송 (공개 채널에 전송, 제목 없이)",
     )
     @app_commands.describe(
         color="HEX 색상 코드 (#RRGGBB)",
