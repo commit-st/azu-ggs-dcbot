@@ -4,11 +4,10 @@ from discord.ext import commands
 
 class ReadyMadeAnnounce(commands.Cog):
     """
-    !rma — 미리 정의된 여러 공지를 첫 번째 예시처럼 출력합니다.
+    !rma — 미리 정의된 공지들을 한 번에 Embed로 출력합니다.
     """
     def __init__(self, bot):
         self.bot = bot
-        # 섹션 정의: 이모지, 제목, 내용
         self.sections = [
             {
                 "emoji": "1️⃣",
@@ -36,42 +35,31 @@ class ReadyMadeAnnounce(commands.Cog):
                     "Use respectful language."
                 )
             },
-            # 필요하신 섹션을 추가…
+            # 필요에 따라 추가…
         ]
 
     @commands.command(name="rma")
     @commands.has_permissions(administrator=True)
     async def rma(self, ctx: commands.Context):
-        # 1) Embed 생성 (사이드 컬러 바만 설정)
-        embed = discord.Embed(color=discord.Color.gold())
-
-        # 2) 헤더 필드: 가장 크게 보이는 영역
-        embed.add_field(
-            name="📜 RULES /",
-            value="\u200b",    # zero-width space: 제목만 띄우기
-            inline=False
+        # 1) 임베드 생성: title이 가장 크게 표시됩니다.
+        embed = discord.Embed(
+            title="📜 RULES /",
+            color=discord.Color.gold()
         )
 
-        # 3) 헤더 아래 얇은 분리선
-        thin_sep = "\u2500" * 40  # U+2500 ('─') 40개
-        embed.add_field(
-            name="\u200b",
-            value=thin_sep,
-            inline=False
-        )
-
-        # 4) 각 섹션을 순서대로 추가
+        # 2) 각 섹션을 field 로 추가 (제목+내용)
         for sec in self.sections:
             embed.add_field(
-                name=f"{sec['emoji']} **{sec['title']}**",
+                name=f"{sec['emoji']} {sec['title']}",
                 value=sec["content"],
                 inline=False
             )
 
-        # 5) 푸터 안내
+        # 3) 푸터 (선택)
         embed.set_footer(text="위 규칙을 준수해 주세요. 문의는 @Staff 채널로.")
 
         await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(ReadyMadeAnnounce(bot))
