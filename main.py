@@ -20,13 +20,15 @@ async def start_web_server():
 # Self-Ping to stay awake
 async def ping_self():
     await bot.wait_until_ready()
-    url = os.environ['KOYEB_URL']
+    url = os.environ.get('KOYEB_URL')
+    print(f"🔔 Self-Ping 시작: {url}")      # ← 추가
     while not bot.is_closed():
         try:
             async with aiohttp.ClientSession() as session:
                 await session.get(url)
-        except:
-            pass
+            print("✔️ Self-Ping 성공")       # ← 추가
+        except Exception as e:
+            print(f"❌ Self-Ping 오류: {e}")  # ← 추가
         await asyncio.sleep(180)
 
 # Discord Bot setup…
@@ -53,4 +55,5 @@ async def on_ready():
     bot.loop.create_task(ping_self())
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
 
