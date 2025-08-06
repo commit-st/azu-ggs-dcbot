@@ -1,10 +1,10 @@
-# cogs/readymadeannounce.py
 import discord
 from discord.ext import commands
 
 class ReadyMadeAnnounce(commands.Cog):
     """
-    !rma — 미리 정의된 공지들을 한 번에 Embed로 출력합니다.
+    !rma — '📜 RULES /' 헤더를 크게, 선택 가능한 텍스트로
+    각 섹션을 예시 1번 스타일처럼 출력합니다.
     """
     def __init__(self, bot):
         self.bot = bot
@@ -35,31 +35,37 @@ class ReadyMadeAnnounce(commands.Cog):
                     "Use respectful language."
                 )
             },
-            # 필요에 따라 추가…
+            # 추가 항목...
         ]
 
     @commands.command(name="rma")
     @commands.has_permissions(administrator=True)
     async def rma(self, ctx: commands.Context):
-        # 1) 임베드 생성: title이 가장 크게 표시됩니다.
-        embed = discord.Embed(
-            title="📜 RULES /",
-            color=discord.Color.gold()
+        # 1) Embed 생성 (컬러 바만 설정)
+        embed = discord.Embed(color=discord.Color.gold())
+
+        # 2) 헤더: set_author 로 가장 크게, 텍스트 선택 가능
+        embed.set_author(
+            name="📜 RULES /"
+            # icon_url=None  # 필요 없으면 생략
         )
 
-        # 2) 각 섹션을 field 로 추가 (제목+내용)
+        # 3) 얇은 분리선 (옵션)
+        thin_sep = "\u2500" * 40
+        embed.add_field(name="\u200b", value=thin_sep, inline=False)
+
+        # 4) 섹션들
         for sec in self.sections:
             embed.add_field(
-                name=f"{sec['emoji']} {sec['title']}",
+                name=f"{sec['emoji']} **{sec['title']}**",
                 value=sec["content"],
                 inline=False
             )
 
-        # 3) 푸터 (선택)
+        # 5) 푸터
         embed.set_footer(text="위 규칙을 준수해 주세요. 문의는 @Staff 채널로.")
 
         await ctx.send(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(ReadyMadeAnnounce(bot))
