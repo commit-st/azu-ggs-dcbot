@@ -4,12 +4,11 @@ from discord.ext import commands
 
 class ReadyMadeAnnounce(commands.Cog):
     """
-    !rma — 미리 정의된 여러 공지(섹션)를 한 번에 출력합니다.
+    !rma — 미리 정의된 여러 공지를 첫 번째 예시처럼 출력합니다.
     """
     def __init__(self, bot):
         self.bot = bot
-
-        # 2️⃣, 3️⃣ … 섹션 정의
+        # 섹션 정의: 이모지, 제목, 내용
         self.sections = [
             {
                 "emoji": "1️⃣",
@@ -37,39 +36,39 @@ class ReadyMadeAnnounce(commands.Cog):
                     "Use respectful language."
                 )
             },
-            # …필요한 만큼 계속 추가
+            # 필요하신 섹션을 추가…
         ]
 
     @commands.command(name="rma")
     @commands.has_permissions(administrator=True)
     async def rma(self, ctx: commands.Context):
-        # 1) Embed 기본 생성
+        # 1) Embed 생성 (사이드 컬러 바만 설정)
         embed = discord.Embed(color=discord.Color.gold())
 
-        # 2) 최상단 헤더: author를 사용해 크게 표시
-        embed.set_author(
-            name="📜 RULES /",   # 헤더 이모지 + 텍스트
+        # 2) 헤더 필드: 가장 크게 보이는 영역
+        embed.add_field(
+            name="📜 RULES /",
+            value="\u200b",    # zero-width space: 제목만 띄우기
+            inline=False
         )
 
-        # 3) 각 섹션을 add_field로 추가
+        # 3) 헤더 아래 얇은 분리선
+        thin_sep = "\u2500" * 40  # U+2500 ('─') 40개
+        embed.add_field(
+            name="\u200b",
+            value=thin_sep,
+            inline=False
+        )
+
+        # 4) 각 섹션을 순서대로 추가
         for sec in self.sections:
-            # 필드 이름에 이모지+굵은 제목
-            field_name = f"{sec['emoji']} **{sec['title']}**"
             embed.add_field(
-                name=field_name,
+                name=f"{sec['emoji']} **{sec['title']}**",
                 value=sec["content"],
                 inline=False
             )
 
-        # 4) 작은 분리선(본문 field로 추가하면 복사 가능)
-        separator = "\u2500" * 40
-        embed.add_field(
-            name="\u200b",    # zero-width space
-            value=separator,
-            inline=False
-        )
-
-        # 5) 마지막 푸터
+        # 5) 푸터 안내
         embed.set_footer(text="위 규칙을 준수해 주세요. 문의는 @Staff 채널로.")
 
         await ctx.send(embed=embed)
