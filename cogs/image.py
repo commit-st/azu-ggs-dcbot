@@ -9,8 +9,7 @@ class ImageSender(commands.Cog):
 
     @app_commands.command(
         name="image",
-        description="이미지 링크를 임베드로 전송합니다",
-        default_member_permissions=discord.Permissions(administrator=True),  # ← 추가
+        description="이미지 링크를 임베드로 전송합니다"
     )
     @app_commands.describe(
         url="전송할 이미지의 URL을 입력하세요",
@@ -20,7 +19,6 @@ class ImageSender(commands.Cog):
         """이미지를 Embed로 전송합니다"""
         embed = discord.Embed()
         embed.set_image(url=url)
-        # 공개 응답
         await interaction.response.send_message(embed=embed)
 
 async def setup(bot):
