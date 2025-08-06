@@ -1,3 +1,4 @@
+# cogs/image.py
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -8,10 +9,11 @@ class ImageSender(commands.Cog):
 
     @app_commands.command(
         name="image",
-        description="이미지 링크를 임베드로 전송합니다"
+        description="이미지 링크를 임베드로 전송합니다",
+        default_member_permissions=discord.Permissions(administrator=True),  # ← 추가
     )
     @app_commands.describe(
-        url="전송할 이미지의 URL을 입력하세요"
+        url="전송할 이미지의 URL을 입력하세요",
     )
     @app_commands.checks.has_permissions(administrator=True)
     async def image(self, interaction: discord.Interaction, url: str):
