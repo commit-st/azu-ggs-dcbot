@@ -40,7 +40,7 @@ class Announce(commands.Cog):
             )
         # 구분선 생성
         separator = "─" * 30
-        # Embed 구성
+        # Embed 구성: 제목 + 구분선 + 본문
         embed = discord.Embed(
             title=title,
             description=f"{separator}\n{content}",
@@ -51,7 +51,7 @@ class Announce(commands.Cog):
 
     @app_commands.command(
         name="colorchat",
-        description="Embed 공지 미리보기 (호출자만 보임)"
+        description="Embed 메시지 전송 (공개 채널에 전송, 제목 없이)"
     )
     @app_commands.describe(
         color="HEX 색상 코드 (#RRGGBB)",
@@ -66,9 +66,10 @@ class Announce(commands.Cog):
     ):
         """
         사용법 예시:
-        /colorchat color:#FFD700 content:"점검이 오후 2시에 시작됩니다."
+        /colorchat color:#FF69B4 content:"여기에 메시지를 입력하세요."
         관리자 권한이 있는 사용자만 사용 가능
         """
+        # 색상 파싱
         try:
             c = int(color.lstrip("#"), 16)
         except ValueError:
@@ -76,15 +77,13 @@ class Announce(commands.Cog):
                 "❌ 유효한 색상 코드를 입력하세요. ex) #FF69B4",
                 ephemeral=True
             )
+        # Embed 구성: 구분선 없이 본문만
         embed = discord.Embed(
             description=content,
             color=discord.Color(c)
         )
-        # Ephemeral 응답 (호출자만 보임)
-        await interaction.response.send_message(
-            embed=embed,
-            ephemeral=True
-        )
+        # 공개 응답
+        await interaction.response.send_message(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Announce(bot))
