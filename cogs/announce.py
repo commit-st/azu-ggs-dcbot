@@ -10,6 +10,7 @@ class Announce(commands.Cog):
     @app_commands.command(
         name="announce",
         description="Embed 공지 전송 (공개 채널에 전송)"
+        default_member_permissions=discord.Permissions(administrator=True)
     )
     @app_commands.describe(
         color="HEX 색상 코드 (#RRGGBB)",
