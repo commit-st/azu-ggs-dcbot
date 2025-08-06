@@ -49,9 +49,11 @@ bot = MyBot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     await bot.tree.sync()
+
     print(f"{bot.user.name} 연결 완료!🩵")
     bot.loop.create_task(start_web_server())
     bot.loop.create_task(ping_self())
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
 
