@@ -7,6 +7,7 @@ class Announce(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # ─ Slash announce ─
     @app_commands.command(
         name="announce",
         description="Embed 공지 전송 (공개 채널에 전송)"
@@ -24,23 +25,9 @@ class Announce(commands.Cog):
         title: str,
         content: str
     ):
-        # 색상 파싱
-        try:
-            c = int(color.lstrip("#"), 16)
-        except ValueError:
-            return await interaction.response.send_message(
-                "❌ 유효한 색상 코드를 입력하세요. ex) #FF69B4",
-                ephemeral=True
-            )
+        # … (기존 로직) …
 
-        separator = "─" * 30
-        embed = discord.Embed(
-            title=title,
-            description=f"{separator}\n{content}",
-            color=discord.Color(c)
-        )
-        await interaction.response.send_message(embed=embed)
-
+    # ─ Slash colorchat ─
     @app_commands.command(
         name="colorchat",
         description="Embed 메시지 전송 (공개 채널에 전송, 제목 없이)"
@@ -56,20 +43,29 @@ class Announce(commands.Cog):
         color: str,
         content: str
     ):
+        # … (기존 로직) …
+
+    # ─ Prefix announce ─
+    @commands.command(name="announce")
+    @commands.has_permissions(administrator=True)
+    async def announce_prefix(self, ctx, color: str, title: str, *, content: str):
+        # … (기존 announce_prefix 로직) …
+
+    # ─ Prefix colorchat ─
+    @commands.command(name="colorchat")
+    @commands.has_permissions(administrator=True)
+    async def colorchat_prefix(self, ctx, color: str, *, content: str):
         # 색상 파싱
         try:
             c = int(color.lstrip("#"), 16)
         except ValueError:
-            return await interaction.response.send_message(
-                "❌ 유효한 색상 코드를 입력하세요. ex) #FF69B4",
-                ephemeral=True
-            )
-
+            return await ctx.send("❌ 유효한 색상 코드를 입력하세요. ex) #FF69B4")
+        # Embed 생성 (본문만)
         embed = discord.Embed(
             description=content,
             color=discord.Color(c)
         )
-        await interaction.response.send_message(embed=embed)
+        await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Announce(bot))
