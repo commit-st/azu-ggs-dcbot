@@ -17,8 +17,29 @@ class Announce(commands.Cog):
         content="본문",
     )
     @app_commands.checks.has_permissions(administrator=True)
-    async def announce(…):
-        …
+    async def announce(
+        self,
+        interaction: discord.Interaction,
+        color: str,
+        title: str,
+        content: str
+    ):
+        # 색상 파싱
+        try:
+            c = int(color.lstrip("#"), 16)
+        except ValueError:
+            return await interaction.response.send_message(
+                "❌ 유효한 색상 코드를 입력하세요. ex) #FF69B4",
+                ephemeral=True
+            )
+
+        separator = "─" * 30
+        embed = discord.Embed(
+            title=title,
+            description=f"{separator}\n{content}",
+            color=discord.Color(c)
+        )
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
         name="colorchat",
@@ -29,5 +50,26 @@ class Announce(commands.Cog):
         content="본문",
     )
     @app_commands.checks.has_permissions(administrator=True)
-    async def colorchat(…):
-        …
+    async def colorchat(
+        self,
+        interaction: discord.Interaction,
+        color: str,
+        content: str
+    ):
+        # 색상 파싱
+        try:
+            c = int(color.lstrip("#"), 16)
+        except ValueError:
+            return await interaction.response.send_message(
+                "❌ 유효한 색상 코드를 입력하세요. ex) #FF69B4",
+                ephemeral=True
+            )
+
+        embed = discord.Embed(
+            description=content,
+            color=discord.Color(c)
+        )
+        await interaction.response.send_message(embed=embed)
+
+async def setup(bot):
+    await bot.add_cog(Announce(bot))
