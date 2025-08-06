@@ -9,8 +9,7 @@ class Announce(commands.Cog):
 
     @app_commands.command(
         name="announce",
-        description="Embed 공지 전송 (공개 채널에 전송)",
-        default_member_permissions=discord.Permissions(administrator=True),
+        description="Embed 공지 전송 (공개 채널에 전송)"
     )
     @app_commands.describe(
         color="HEX 색상 코드 (#RRGGBB)",
@@ -23,7 +22,7 @@ class Announce(commands.Cog):
         interaction: discord.Interaction,
         color: str,
         title: str,
-        content: str,
+        content: str
     ):
         # 색상 파싱
         try:
@@ -34,10 +33,8 @@ class Announce(commands.Cog):
                 ephemeral=True
             )
             return
-
         # 구분선 생성
         separator = "─" * 30
-
         # Embed 구성: 제목 + 구분선 + 본문
         embed = discord.Embed(
             title=title,
@@ -48,8 +45,7 @@ class Announce(commands.Cog):
 
     @app_commands.command(
         name="colorchat",
-        description="Embed 메시지 전송 (공개 채널에 전송, 제목 없이)",
-        default_member_permissions=discord.Permissions(administrator=True),
+        description="Embed 메시지 전송 (공개 채널에 전송, 제목 없이)"
     )
     @app_commands.describe(
         color="HEX 색상 코드 (#RRGGBB)",
@@ -60,7 +56,7 @@ class Announce(commands.Cog):
         self,
         interaction: discord.Interaction,
         color: str,
-        content: str,
+        content: str
     ):
         # 색상 파싱
         try:
@@ -71,7 +67,6 @@ class Announce(commands.Cog):
                 ephemeral=True
             )
             return
-
         # Embed 구성: 본문만
         embed = discord.Embed(
             description=content,
