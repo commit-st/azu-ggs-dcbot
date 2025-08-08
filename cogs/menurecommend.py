@@ -2,11 +2,11 @@ import random
 import discord
 from discord.ext import commands
 from discord import app_commands
+from discord.utils import escape_markdown as esc  # 굵게 처리 시 마크다운 이스케이프
 
 class MenuRecommend(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        # 메뉴 종류
         self.fortunes = [
             "피자", "로제떡볶이", "토마토파스타", "짜장면", "크림우동", "불닭볶음면", "닭갈비", "제육볶음", "닭볶음탕", "후토마끼", "치즈그라탕",
             "고구마치즈돈까스", "경양식돈까스와 스프", "안심/등심 돈까스", "타코야끼", "까르보불닭", "계란초밥", "장새우초밥", "참치마요", "치킨마요",
@@ -27,39 +27,24 @@ class MenuRecommend(commands.Cog):
             "곤약국수", "컵밥", "밥버거", "노랑통닭 알마치", "열무국수", "열무비빔밥", "굴밥", "조개탕", "물", "생오이/당근에 장 찍어먹기",
         ]
 
-    # 내부 메시지 포맷터
     def _menu_message(self, user_mention: str, choice: str) -> str:
-        return f"😋 {user_mention}님을 위한 메뉴 추천! **{esc(choice)}** 어떠세요? 맛있게 드세요! 🍽️"
+        return f"😋 {user_mention}님을 위한 메뉴 추천! **{esc(choice)}** 어떠세요? 맛있게 드세요!🍽️"
 
-    # 접두사 명령어
     @commands.command(name="메추")
     async def fortune_prefix(self, ctx: commands.Context):
         choice = random.choice(self.fortunes)
         await ctx.send(self._menu_message(ctx.author.mention, choice))
 
-    # 슬래시 명령어(ASCII 이름) + 한국어 로컬라이징으로 "/메추" 표기
     @app_commands.command(name="menu", description="메뉴를 추천해드려요!")
     async def fortune_slash(self, interaction: discord.Interaction):
         choice = random.choice(self.fortunes)
         await interaction.response.send_message(self._menu_message(interaction.user.mention, choice))
 
-    # (선택) 동기화 커맨드 — 봇 소유자만
-    @commands.command(name="sync")
-    @commands.is_owner()
-    async def sync_app_commands(self, ctx: commands.Context):
-        await self.bot.tree.sync()
-        await ctx.send("✅ 슬래시 명령어 동기화 완료.")
-
-# --- 한국어 로컬라이징 (discord.py 2.3+)
+# 한국어 로컬라이징: /menu → /메추 로 보이게
 class SimpleKoTranslator(app_commands.Translator):
     async def translate(self, string: app_commands.locale_str, locale: discord.Locale, context: app_commands.TranslationContext):
         if locale is discord.Locale.korean:
-            table = {
-                # 명령어 이름
-                "menu": "메추",
-                # 설명
-                "메뉴를 추천해드려요!": "메뉴를 추천해드려요!",
-            }
+            table = {"menu": "메추", "메뉴를 추천해드려요!": "메뉴를 추천해드려요!"}
             return table.get(str(string))
         return None
 
