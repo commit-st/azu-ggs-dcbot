@@ -18,7 +18,7 @@ class LuckyItem(commands.Cog):
 
     # 내부 공용 포맷터
     def _lucky_message(self, user_mention: str, item: str) -> str:
-        return f"🍀 {user_mention} 오늘의 행운 아이템: **{item}**"
+        return f"🍀 {user_mention} 님을 위한 오늘의 행운 아이템: **{esc(item)}**"
 
     # 접두사(!) 명령어 — 한글 가능
     @commands.command(name="행운아이템")
