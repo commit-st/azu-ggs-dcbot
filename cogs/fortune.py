@@ -4,11 +4,10 @@ from discord.ext import commands
 from discord import app_commands
 from discord.utils import escape_markdown as esc
 
-class Fortune(commands.Cog):
+class LuckyItem(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        # 운세 멘트 리스트 (예시)
-        self.fortunes = [
+        self.lucky_items = [
             "오늘은 행복한 하루가 될 거예요!",
             "대화를 할 때 신중해야 할 것 같아요.",
             "작은 행운이 연달아 찾아올 수 있어요.",
@@ -58,44 +57,47 @@ class Fortune(commands.Cog):
             "작은 선의가 돌아옵니다. 감사 인사를 아끼지 마세요.",
             "새로운 도구 배우기 좋은 날. 30분만 투자해도 성과.",
             "타이밍이 핵심. 중요한 결정은 오후로 미루는 게 유리.",            
-        ]
+    ]
 
-    # 접두사(!) 명령어
-    @commands.command(name="운세")
-    async def fortune_prefix(self, ctx: commands.Context):
-        """!운세: 오늘의 운세를 알려줍니다."""
-        choice = random.choice(self.fortunes)
-        await ctx.send(f"🍀 {ctx.author.mention}님의 운세: **{esc(choice)}**")
+    def _lucky_message(self, user_mention: str, item: str) -> str:
+        return f"🍀 {user_mention} 오늘의 행운 아이템: **{esc(item)}**"
 
-    # 슬래시 명령어(ASCII name) + 한국어 로컬라이징으로 "/운세" 표기
-    @app_commands.command(name="fortune", description="오늘의 운세를 알려줍니다.")
-    async def fortune_slash(self, interaction: discord.Interaction):
-        choice = random.choice(self.fortunes)
-        await interaction.response.send_message(f"🍀 {interaction.user.mention}님의 운세: **{esc(choice)}**")
+    @commands.command(name="행운아이템")
+    async def lucky_prefix(self, ctx: commands.Context):
+        item = random.choice(self.lucky_items)
+        await ctx.send(self._lucky_message(ctx.author.mention, item))
 
-    # (선택) 동기화 커맨드 — 봇 소유자만
-    @commands.command(name="sync")
-    @commands.is_owner()
-    async def sync_app_commands(self, ctx: commands.Context):
-        await self.bot.tree.sync()
-        await ctx.send("✅ 슬래시 명령어 동기화 완료.")
+    @app_commands.command(name="luckyitem", description="오늘의 행운 아이템을 뽑아요!")
+    async def lucky_slash(self, interaction: discord.Interaction):
+        item = random.choice(self.lucky_items)
+        await interaction.response.send_message(self._lucky_message(interaction.user.mention, item))
 
-# --- 한국어 로컬라이징 (discord.py 2.3+)
+
+# ✅ 클래스 밖으로 이동한 컨텍스트 메뉴
+@app_commands.context_menu(name="행운 아이템 뽑기")
+async def lucky_user_ctx(interaction: discord.Interaction, member: discord.Member):
+    bot = interaction.client  # type: ignore
+    cog = bot.get_cog("LuckyItem")
+    if cog is None:
+        await interaction.response.send_message("⚠️ LuckyItem cog가 아직 로드되지 않았어요.", ephemeral=True)
+        return
+    item = random.choice(cog.lucky_items)
+    await interaction.response.send_message(cog._lucky_message(member.mention, item))
+
+
+# (선택) 한국어 로컬라이징
 class SimpleKoTranslator(app_commands.Translator):
     async def translate(self, string: app_commands.locale_str, locale: discord.Locale, context: app_commands.TranslationContext):
         if locale is discord.Locale.korean:
-            table = {
-                # 슬래시 명령어 이름
-                "fortune": "운세",
-                # 설명
-                "오늘의 운세를 알려줍니다.": "오늘의 운세를 알려줍니다.",
-            }
+            table = {"luckyitem": "행운아이템", "오늘의 행운 아이템을 뽑아요!": "오늘의 행운 아이템을 뽑아요!"}
             return table.get(str(string))
         return None
+
 
 async def setup(bot: commands.Bot):
     try:
         await bot.tree.set_translator(SimpleKoTranslator())
     except Exception:
         pass
-    await bot.add_cog(Fortune(bot))
+    await bot.add_cog(LuckyItem(bot))
+    bot.tree.add_command(lucky_user_ctx)
