@@ -1,9 +1,10 @@
 import random
 import discord
 from discord.ext import commands
+from discord import app_commands
 
 class MenuRecommend(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         # 메뉴 종류
         self.fortunes = [
@@ -26,11 +27,45 @@ class MenuRecommend(commands.Cog):
             "곤약국수", "컵밥", "밥버거", "노랑통닭 알마치", "열무국수", "열무비빔밥", "굴밥", "조개탕", "물", "생오이/당근에 장 찍어먹기",
         ]
 
-    @commands.command(name="메추")
-    async def fortune(self, ctx):
-        """!메추: 메뉴를 추천해드려요!"""
-        choice = random.choice(self.fortunes)
-        await ctx.send(f"😋 {ctx.author.mention}님을 위한 메뉴 추천! {choice} 어떠세요? 맛있게 드세요!🍽️")
+    # 내부 메시지 포맷터
+    def _menu_message(self, user_mention: str, choice: str) -> str:
+        return f"😋 {user_mention}님을 위한 메뉴 추천! **{esc(choice)}** 어떠세요? 맛있게 드세요! 🍽️"
 
-async def setup(bot):
+    # 접두사 명령어
+    @commands.command(name="메추")
+    async def fortune_prefix(self, ctx: commands.Context):
+        choice = random.choice(self.fortunes)
+        await ctx.send(self._menu_message(ctx.author.mention, choice))
+
+    # 슬래시 명령어(ASCII 이름) + 한국어 로컬라이징으로 "/메추" 표기
+    @app_commands.command(name="menu", description="메뉴를 추천해드려요!")
+    async def fortune_slash(self, interaction: discord.Interaction):
+        choice = random.choice(self.fortunes)
+        await interaction.response.send_message(self._menu_message(interaction.user.mention, choice))
+
+    # (선택) 동기화 커맨드 — 봇 소유자만
+    @commands.command(name="sync")
+    @commands.is_owner()
+    async def sync_app_commands(self, ctx: commands.Context):
+        await self.bot.tree.sync()
+        await ctx.send("✅ 슬래시 명령어 동기화 완료.")
+
+# --- 한국어 로컬라이징 (discord.py 2.3+)
+class SimpleKoTranslator(app_commands.Translator):
+    async def translate(self, string: app_commands.locale_str, locale: discord.Locale, context: app_commands.TranslationContext):
+        if locale is discord.Locale.korean:
+            table = {
+                # 명령어 이름
+                "menu": "메추",
+                # 설명
+                "메뉴를 추천해드려요!": "메뉴를 추천해드려요!",
+            }
+            return table.get(str(string))
+        return None
+
+async def setup(bot: commands.Bot):
+    try:
+        await bot.tree.set_translator(SimpleKoTranslator())
+    except Exception:
+        pass
     await bot.add_cog(MenuRecommend(bot))
